@@ -1,0 +1,26 @@
+# air.toml
+
+# Entrypoint file
+# The file that contains your main function
+[build]
+  entry = "main.go"
+
+# Directories to watch
+# Air will watch these directories for changes
+[build.watch]
+  dirs = ["."]
+
+# Commands to run before building
+# You can add any pre-build commands here
+[build.commands]
+  build = "go build -o ./tmp/main ."
+
+# Commands to run after building
+# You can add any post-build commands here
+[build.commands]
+  run = ["./tmp/main"]
+
+# Environment variables
+# You can define environment variables here
+[build.env]
+  APP_ENV = "development"
