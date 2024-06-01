@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: jeesimplifiedgp.azurecr.io/postgres:latest
+    environment:
+      - POSTGRES_DB=studentdatas
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=mysecretpassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    image: jeesimplifiedgp.azurecr.io/guidance-go-app:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=mysecretpassword
+      - DB_NAME=studentdatas
+    depends_on:
+      - postgres
+    command: ["/wait-for-it.sh", "postgres:5432", "--timeout=60", "--", "/app/docker-gs-ping"]
+
+volumes:
+  postgres_data:

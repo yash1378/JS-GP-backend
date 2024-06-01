@@ -28,6 +28,7 @@ type MentorSchema struct {
 	Name    string `json:"name"`
 	College string `json:"college"`
 	Date    string `json:"date"`
+	Phone   string `json:"phone"`
 	Handle  int    `json:"-" gorm:"default:0"`
 	Onn     int    `json:"-" gorm:"default:0"`
 	Total   int    `json:"-" gorm:"default:0"`
@@ -50,6 +51,13 @@ type RenrollSchema struct {
 	Sub         string `json:"sub"`
 	Mentor      string `json:"-" gorm:"default:"`
 	Renrollment uint   `json:"-" gorm:"default:0"`
+}
+
+type OwnerSchema struct {
+	ID        uint   `json:"id" gorm:"primaryKey"`
+	Email     string `json:"email"`
+	Password  string `json:"password"`
+	OwnerName string `json:"ownername"`
 }
 
 func init() {
@@ -90,6 +98,10 @@ func ConnectDatabase() {
 
 	if !database.Migrator().HasTable(&MentorLogin{}) {
 		database.AutoMigrate(&MentorLogin{})
+	}
+
+	if !database.Migrator().HasTable(&OwnerSchema{}) {
+		database.AutoMigrate(&OwnerSchema{})
 	}
 	DB1 = database
 
