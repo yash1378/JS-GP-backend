@@ -242,3 +242,59 @@ func DELETE(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "User data deleted successfully"})
 }
+
+func UserWithoutMentor(c *gin.Context) {
+	var wg sync.WaitGroup
+
+	// Query the database to get all users
+	rows, err := db1.Model(&UserSchema{}).Rows()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer rows.Close()
+
+	fmt.Println(rows)
+
+	// Collect all rows in a slice
+	var userSchemas []UserSchema
+	for rows.Next() {
+		var user UserSchema
+		if err := db1.ScanRows(rows, &user); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		userSchemas = append(userSchemas, user)
+	}
+
+	// Create a channel to receive users from goroutines
+	usersChan := make(chan UserSchema, len(userSchemas))
+
+	// Create a goroutine for each user schema to process them concurrently
+	for _, user := range userSchemas {
+		wg.Add(1)
+		go func(user UserSchema) {
+			defer wg.Done()
+			// Check if mentor field is empty
+			if user.Mentor == "" {
+				// If mentor field is empty, simulate processing the user
+				usersChan <- user
+			}
+		}(user)
+	}
+
+	// Close the WaitGroup after all goroutines finish
+	go func() {
+		wg.Wait()
+		close(usersChan)
+	}()
+
+	// Collect users from the channel and add them to the response slice
+	var users []UserSchema
+	for user := range usersChan {
+		users = append(users, user)
+	}
+
+	fmt.Println(users)
+	c.JSON(http.StatusOK, users)
+}

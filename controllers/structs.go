@@ -87,6 +87,47 @@ type deleteSchema struct {
 	Mentors []string `json:"mentors"`
 }
 
+type Payload struct {
+	Order   OrderDetails   `json:"order"`
+	Payment PaymentDetails `json:"payment"`
+}
+
+// OrderDetails represents the order object within the payload
+type OrderDetails struct {
+	Entity OrderEntity `json:"entity"`
+}
+
+// OrderEntity represents the entity object within the order details
+type OrderEntity struct {
+	Notes OrderNotes `json:"notes"`
+}
+
+// OrderNotes represents the notes object within the order entity
+type OrderNotes struct {
+	Class string `json:"class"`
+	Email string `json:"email"`
+	Name  string `json:"name"`
+	Phone string `json:"phone"`
+}
+
+// PaymentDetails represents the payment object within the payload
+type PaymentDetails struct {
+	Entity PaymentEntity `json:"entity"`
+}
+
+// PaymentEntity represents the entity object within the payment details
+type PaymentEntity struct {
+	Notes PaymentNotes `json:"notes"`
+}
+
+// PaymentNotes represents the notes object within the payment entity
+type PaymentNotes struct {
+	Class string `json:"class"`
+	Email string `json:"email"`
+	Name  string `json:"name"`
+	Phone string `json:"phone"`
+}
+
 // for StudentData
 type Student struct {
 	Name      string `json:"studentName" binding:"required"`

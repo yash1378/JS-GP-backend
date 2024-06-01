@@ -23,6 +23,7 @@ func main() {
 	// Use the CORS middleware with the configured settings
 	r.Use(cors.New(config))
 	models.ConnectDatabase()
+	r.GET("/data_without_mentor", controllers.UserWithoutMentor)
 	r.GET("/api/data", controllers.UserGet)                      //checked and Final
 	r.POST("/", controllers.UserPost)                            //checked and Final
 	r.GET("/api/mentorData", controllers.MentorGet)              //checked and Final
