@@ -87,6 +87,10 @@ type deleteSchema struct {
 	Mentors []string `json:"mentors"`
 }
 
+type deleteMentSchema struct {
+	IDs []uint `json:"ids"`
+}
+
 type Payload struct {
 	Order   OrderDetails   `json:"order"`
 	Payment PaymentDetails `json:"payment"`

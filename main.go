@@ -41,6 +41,8 @@ func main() {
 	r.POST("/order", controllers.Order)
 	r.GET("/getkey", controllers.Key)
 	r.POST("/api/paymentverify", controllers.Verify)
+	r.GET("/api/mentdelete", controllers.DelMentorGet)
+	r.DELETE("/mentdelete", controllers.DelMentor)
 	// Start the server
 	r.Run(":8080")
 }

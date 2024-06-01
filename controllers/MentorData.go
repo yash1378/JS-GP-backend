@@ -462,3 +462,90 @@ func FinalMentor(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Mentor and students updated successfully"})
 }
+
+func DelMentorGet(c *gin.Context) {
+	var wg1 sync.WaitGroup
+
+	rows, err := db2.Model(&MentorSchema{}).Rows()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	// makes sure to lose all rows data to prevent data leaks
+	defer rows.Close()
+
+	var mentorSchemas []MentorSchema
+	for rows.Next() {
+		var mentor MentorSchema
+		// here go routines can't be used as then db would be called by all at the same time
+		if err := db2.ScanRows(rows, &mentor); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		mentorSchemas = append(mentorSchemas, mentor)
+	}
+
+	mentorsChan := make(chan MentorSchema, len(mentorSchemas))
+	for _, mentor := range mentorSchemas {
+		if mentor.Onn == 0 {
+			wg1.Add(1)
+			go func(mentor MentorSchema) {
+				defer wg1.Done()
+				mentorsChan <- mentor
+			}(mentor)
+		}
+
+	}
+
+	go func() {
+		wg1.Wait()
+		close(mentorsChan)
+	}()
+
+	var mentors []MentorSchema
+	for mentor := range mentorsChan {
+		mentors = append(mentors, mentor)
+	}
+
+	c.JSON(http.StatusOK, mentors)
+}
+
+func DelMentor(c *gin.Context) {
+	var input deleteMentSchema
+	if err := c.ShouldBindBodyWithJSON(&input); err != nil {
+		fmt.Println("2")
+		fmt.Println(input)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	fmt.Println("1")
+	fmt.Println(input)
+
+	// Create a wait group to wait for all Goroutines to finish
+	var wg sync.WaitGroup
+
+	// Iterate over the IDs and delete each row concurrently
+	for _, id := range input.IDs {
+		// Increment the wait group counter
+		wg.Add(1)
+
+		// Launch a Goroutine to delete the row
+		go func(id uint) {
+			defer wg.Done()
+
+			// Construct the delete query
+			result := db2.Where("id=?", id).Delete(&MentorSchema{})
+
+			// Check for errors
+			if err := result.Error; err != nil {
+				// Handle error (e.g., log it)
+				c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				return
+			}
+		}(id)
+	}
+	// Wait for all Goroutines to finish
+	wg.Wait()
+
+	c.JSON(http.StatusOK, gin.H{"message": "Mentor data deleted successfully"})
+}
