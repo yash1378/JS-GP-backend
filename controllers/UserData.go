@@ -203,7 +203,7 @@ func DELETE(c *gin.Context) {
 			defer wg.Done()
 
 			// Construct the delete query
-			result := db1.Where("date > ? AND date < ?", thirtyDaysAgoFormatted, todayFormatted).Where("id = ?", id).Delete(&UserSchema{})
+			result := db1.Where("date >= ? AND date <= ?", thirtyDaysAgoFormatted, todayFormatted).Where("id = ?", id).Delete(&UserSchema{})
 
 			// Check for errors
 			if err := result.Error; err != nil {
