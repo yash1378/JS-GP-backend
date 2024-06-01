@@ -215,8 +215,12 @@ func DELETE(c *gin.Context) {
 	}
 
 	for _, mentor := range input.Mentors {
-		wg.Add(1)
+		// Skip processing if mentor is empty
+		if mentor == "" {
+			continue
+		}
 
+		wg.Add(1)
 		go func(mentor string) {
 			defer wg.Done()
 			var ment MentorSchema
