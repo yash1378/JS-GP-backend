@@ -246,8 +246,12 @@ func MentorStudentUpdate(c *gin.Context) {
 	// 	return
 	// }
 
-	w := cred.Onn            //getting the current value of student
-	cred.Handle = w + number //increasing it by the value of students came in request
+	w := cred.Onn //getting the current value of student
+	if number < w {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to save data"})
+		return
+	}
+	cred.Handle = number //increasing it by the value of students came in request
 
 	if err := db2.Save(&cred).Error; err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to save data"})
