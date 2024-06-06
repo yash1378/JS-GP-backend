@@ -82,12 +82,18 @@ func MentorUpdate(c *gin.Context) {
 		return
 	}
 
+	// fmt.Println(user)
+	// fmt.Println(ment)
+	// fmt.Println(newment)
+	// fmt.Println(body)
+
 	user.Mentor = body.NewMentor
 	user.Name = body.Name
 	user.Email = body.Email
 	user.Phone = body.Phone
 	user.Class = body.Class
 	user.Date = body.Date
+	user.Sub = body.Sub
 
 	ment.Onn = ment.Onn - 1
 	newment.Onn = newment.Onn + 1

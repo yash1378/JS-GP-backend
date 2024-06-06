@@ -140,6 +140,7 @@ type Student struct {
 	Class     string `json:"selectedClass" binding:"required"`
 	Date      string `json:"selectedDate" binding:"required"`
 	NewMentor string `json:"newmentor" binding:"required"`
+	Sub       string `json:"selectedSub" binding:"required"`
 }
 
 type RenrollSchema struct {
