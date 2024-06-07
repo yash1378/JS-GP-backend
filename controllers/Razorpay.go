@@ -103,15 +103,20 @@ func Order(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "notes is missing or invalid in order entity"})
 		return
 	}
-
+	program := orderNotes["program"].(string)
+	if (program!="Premium" && program!="Normal") {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "entity is missing or invalid in order"})
+		return
+	}
 	// Now you can access individual fields within the "notes" object
 	class := orderNotes["class"].(string)
 	email := orderNotes["email"].(string)
 	name := orderNotes["name"].(string)
 	phone := orderNotes["phone"].(string)
 
+
 	fmt.Println("executed1")
-	fmt.Println(entity["amount"])
+	fmt.Println(program)
 
 	var wg sync.WaitGroup
 	resultChan := make(chan int, 1)
@@ -123,19 +128,18 @@ func Order(c *gin.Context) {
 	input.Phone = phone
 	input.Class = class
 
-	amount, ok := entity["amount"]
-	if !ok {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "entity is missing or invalid in order"})
-		return
-	}
+
 
 	fmt.Println("executed2")
 
-	if amount == 160000 {
+	if program=="Normal" {
 		input.Sub = "Normal"
 	} else {
 		input.Sub = "Premium"
 	}
+
+
+	// return
 
 	// Assigning today's date to input.Date in the format YYYY-MM-DD
 	today := time.Now()
@@ -198,7 +202,6 @@ func Order(c *gin.Context) {
 	fmt.Println(name)
 	fmt.Println(email)
 	fmt.Println(phone)
-	fmt.Print(amount)
 	fmt.Println(today)
 
 	c.JSON(http.StatusOK, gin.H{"message": "User data saved successfully"})
