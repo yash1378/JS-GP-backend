@@ -79,6 +79,14 @@ func Order(c *gin.Context) {
 		return
 	}
 
+	eve := inp["event"].(string)
+
+	if(eve!="payment.captured"){
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "payment is failed"})
+		return
+	}
+
+
 
 	// Check if "payload" exists and is not nil
 	payload, ok := inp["payload"].(map[string]interface{})
@@ -112,12 +120,6 @@ func Order(c *gin.Context) {
 		return
 	}
 
-	eve := inp["event"].(string)
-
-	if(eve!="payment.captured"){
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "payment is failed"})
-		return
-	}
 
 	// Now you can access individual fields within the "notes" object
 	class := orderNotes["class"].(string)
