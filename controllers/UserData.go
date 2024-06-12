@@ -180,65 +180,66 @@ func DELETE(c *gin.Context) {
 		return
 	}
 	fmt.Println("1")
-	fmt.Println(input)
+	fmt.Println(input.IDs)
+	fmt.Println(input.Mentors)
 
-	today := time.Now()
+	// today := time.Now()
 
-	// Subtract 30 days
-	thirtyDaysAgo := today.AddDate(0, 0, -30)
+	// // Subtract 30 days
+	// thirtyDaysAgo := today.AddDate(0, 0, -30)
 
-	todayFormatted := today.Format("2006-01-02")
-	thirtyDaysAgoFormatted := thirtyDaysAgo.Format("2006-01-02")
+	// todayFormatted := today.Format("2006-01-02")
+	// thirtyDaysAgoFormatted := thirtyDaysAgo.Format("2006-01-02")
 
-	// Create a wait group to wait for all Goroutines to finish
-	var wg sync.WaitGroup
+	// // Create a wait group to wait for all Goroutines to finish
+	// var wg sync.WaitGroup
 
-	// Iterate over the IDs and delete each row concurrently
-	for _, id := range input.IDs {
+	// // Iterate over the IDs and delete each row concurrently
+	// for _, id := range input.IDs {
 		// Increment the wait group counter
-		wg.Add(1)
+	// 	wg.Add(1)
 
-		// Launch a Goroutine to delete the row
-		go func(id uint) {
-			defer wg.Done()
+	// 	// Launch a Goroutine to delete the row
+	// 	go func(id uint) {
+	// 		defer wg.Done()
 
-			// Construct the delete query
-			result := db1.Where("date >= ? AND date <= ?", thirtyDaysAgoFormatted, todayFormatted).Where("id = ?", id).Delete(&UserSchema{})
+	// 		// Construct the delete query
+	// 		result := db1.Where("id = ?", id).Delete(&UserSchema{})
 
-			// Check for errors
-			if err := result.Error; err != nil {
-				// Handle error (e.g., log it)
-				c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-				return
-			}
-		}(id)
-	}
+	// 		// Check for errors
+	// 		if err := result.Error; err != nil {
+	// 			// Handle error (e.g., log it)
+	// 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	// 			return
+	// 		}
+	// 	}(id)
+	// }
 
-	for _, mentor := range input.Mentors {
-		// Skip processing if mentor is empty
-		if mentor == "" {
-			continue
-		}
+	// for _, mentor := range input.Mentors {
+	// 	// Skip processing if mentor is empty
+	// 	if mentor == "" {
+	// 		continue
+	// 	}
 
-		wg.Add(1)
-		go func(mentor string) {
-			defer wg.Done()
-			var ment MentorSchema
-			if err := db3.Where("name = ?", mentor).First(&ment).Error; err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-				return
-			}
+	// 	wg.Add(1)
+	// 	go func(mentor string) {
+	// 		defer wg.Done()
+	// 		var ment MentorSchema
+	// 		if err := db3.Where("name = ?", mentor).First(&ment).Error; err != nil {
+	// 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	// 			return
+	// 		}
 
-			ment.Onn = ment.Onn - 1
-			if err := db1.Save(&ment).Error; err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-				return
-			}
-		}(mentor)
-	}
+	// 		ment.Onn = ment.Onn - 1
+	// 		if err := db1.Save(&ment).Error; err != nil {
+	// 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	// 			return
+	// 		}
+	// 	}(mentor)
+	// }
 
 	// Wait for all Goroutines to finish
-	wg.Wait()
+	// wg.Wait()
 
 	c.JSON(http.StatusOK, gin.H{"message": "User data deleted successfully"})
 }

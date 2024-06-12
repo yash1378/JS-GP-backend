@@ -9,6 +9,7 @@ import (
 	"os"
 	"sync"
 	"time"
+	// "encoding/json"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -78,6 +79,7 @@ func Order(c *gin.Context) {
 		return
 	}
 
+
 	// Check if "payload" exists and is not nil
 	payload, ok := inp["payload"].(map[string]interface{})
 	if !ok {
@@ -91,6 +93,7 @@ func Order(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "order is missing or invalid"})
 		return
 	}
+
 
 	entity, ok := order["entity"].(map[string]interface{})
 	if !ok {
@@ -108,6 +111,14 @@ func Order(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "entity is missing or invalid in order"})
 		return
 	}
+
+	eve := inp["event"].(string)
+
+	if(eve!="payment.captured"){
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "payment is failed"})
+		return
+	}
+
 	// Now you can access individual fields within the "notes" object
 	class := orderNotes["class"].(string)
 	email := orderNotes["email"].(string)
